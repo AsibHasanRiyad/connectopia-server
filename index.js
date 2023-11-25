@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 require("dotenv").config();
 
@@ -39,12 +39,22 @@ async function run() {
 
     // post related api
     app.get('/post', async(req, res) =>{
-        const result = await postCollection.find().toArray()
+        const email = req.query.email;
+        const query = email ? {email: email} : {}
+        const result = await postCollection.find(query).toArray()
         res.send(result)
     })
     app.post('/post', async (req, res) =>{
         const data = req.body;
         const result = await postCollection.insertOne(data)
+        res.send(result)
+    })
+
+    //individual post routes
+    app.get('/post/:id', async (req, res) =>{
+        const id = req.params.id;
+        const filter = {_id: new ObjectId(id)}
+        const result = await postCollection.findOne(filter)
         res.send(result)
     })
 
