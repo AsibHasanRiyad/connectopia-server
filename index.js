@@ -1,8 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const express = require("express");
+const cors = require("cors");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
-require('dotenv').config()
+require("dotenv").config();
 
 const app = express();
 
@@ -21,16 +21,46 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    await client.connect();
+
+
+    const postCollection = client.db('connectopia').collection('post')
+
+
+
+
+
+
+    // post related api
+    app.get('/post', async(req, res) =>{
+        const result = await postCollection.find().toArray()
+        res.send(result)
+    })
+    app.post('/post', async (req, res) =>{
+        const data = req.body;
+        const result = await postCollection.insertOne(data)
+        res.send(result)
+    })
+
+
+
+
+
+
+
+
+
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -38,15 +68,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-app.get('/', (req, res) =>{
-
-res.send('Connectopia server is running')
-
+app.get("/", (req, res) => {
+  res.send("Connectopia server is running");
 });
 
-app.listen(port, () =>{
-
-console.log(`Connectopia server is running on port:${port}`);
-
-})
+app.listen(port, () => {
+  console.log(`Connectopia server is running on port:${port}`);
+});
