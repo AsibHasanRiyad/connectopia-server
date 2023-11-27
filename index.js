@@ -116,19 +116,47 @@ async function run() {
     });
 
     // post related api
+    // app.get("/post", async (req, res) => {
+    //   const tag = req.query.tag;
+    //   const email = req.query.email;
+    // //   console.log("pagination", req.query);
+    //   const query = email ? { email: email } : {};
+    //   const page = parseInt(req.query.page);
+    //   const size = parseInt(req.query.size);
+    //   console.log(page, size);
+    //   const result = await postCollection
+    //     .find(query)
+    //     .skip(page * size)
+    //     .limit(size)
+    //     .toArray();
+    //   res.send(result);
+    // });
+
     app.get("/post", async (req, res) => {
+      const tag = req.query.tag;
       const email = req.query.email;
-      console.log("pagination", req.query);
-      const query = email ? { email: email } : {};
       const page = parseInt(req.query.page);
       const size = parseInt(req.query.size);
-      console.log(page, size);
-      const result = await postCollection
-        .find()
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
+
+      if (tag) {
+        const query = { tags: tag };
+        const result = await postCollection
+          .find(query)
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+
+        res.send(result);
+      } else {
+        const query = email ? { email: email } : {};
+        const result = await postCollection
+          .find(query)
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+
+        res.send(result);
+      }
     });
 
     // total number of post
