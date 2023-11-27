@@ -31,6 +31,7 @@ async function run() {
 
     const userCollection = client.db("connectopia").collection("users");
     const postCollection = client.db("connectopia").collection("post");
+    const commentCollection = client.db("connectopia").collection("comments");
     const paymentCollection = client.db("connectopia").collection("payment");
     const announcementCollection = client
       .db("connectopia")
@@ -184,6 +185,22 @@ async function run() {
       const result = await postCollection.deleteOne(filter);
       res.send(result);
     });
+
+
+
+    //comments related api
+    app.get('/comments', async(req, res) =>{
+        const rootPostId = req.query.rootPostId
+        const filter = {rootPostId : rootPostId}
+        const result = await commentCollection.find(filter).toArray()
+        res.send(result)
+
+    })
+    app.post('/comments', async(req, res) =>{
+        const data = req.body
+        const result = await commentCollection.insertOne(data)
+        res.send(result)
+    })
 
     //make announcement api
     app.get("/announcement", async (req, res) => {
