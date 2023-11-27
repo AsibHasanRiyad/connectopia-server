@@ -6,7 +6,7 @@ require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-console.log('stripe key',process.env.STRIPE_SECRET_KEY);
+// console.log('stripe key',process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 5001;
 
 //middleware
@@ -32,7 +32,9 @@ async function run() {
     const userCollection = client.db("connectopia").collection("users");
     const postCollection = client.db("connectopia").collection("post");
     const paymentCollection = client.db("connectopia").collection("payment");
-    const announcementCollection = client.db("connectopia").collection("announcement");
+    const announcementCollection = client
+      .db("connectopia")
+      .collection("announcement");
 
     //created middleware
     //verify token
@@ -116,10 +118,25 @@ async function run() {
     // post related api
     app.get("/post", async (req, res) => {
       const email = req.query.email;
+      console.log("pagination", req.query);
       const query = email ? { email: email } : {};
-      const result = await postCollection.find(query).toArray();
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      console.log(page, size);
+      const result = await postCollection
+        .find()
+        .skip(page * size)
+        .limit(size)
+        .toArray();
       res.send(result);
     });
+
+    // total number of post
+    app.get("/postCount", async (req, res) => {
+      const count = await postCollection.estimatedDocumentCount();
+      res.send({ count });
+    });
+
     app.post("/post", async (req, res) => {
       const data = req.body;
       const result = await postCollection.insertOne(data);
@@ -163,19 +180,19 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
 
-    app.post('/payments', async (req, res) =>{
-        const payment = req.body;
-        const result = await paymentCollection.insertOne(payment);
-        //update user data
-        const query = {email: payment.email}
-        const updateDoc = {
-            $set:{
-                status: 'Gold'
-            }
-        }
-        const updateUserStatus = await userCollection.updateOne(query, updateDoc)
-        res.send({result, updateUserStatus})
-    })
+    app.post("/payments", async (req, res) => {
+      const payment = req.body;
+      const result = await paymentCollection.insertOne(payment);
+      //update user data
+      const query = { email: payment.email };
+      const updateDoc = {
+        $set: {
+          status: "Gold",
+        },
+      };
+      const updateUserStatus = await userCollection.updateOne(query, updateDoc);
+      res.send({ result, updateUserStatus });
+    });
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
