@@ -33,6 +33,7 @@ async function run() {
     const postCollection = client.db("connectopia").collection("post");
     const commentCollection = client.db("connectopia").collection("comments");
     const paymentCollection = client.db("connectopia").collection("payment");
+    const tagsCollection = client.db("connectopia").collection("tags");
     const announcementCollection = client
       .db("connectopia")
       .collection("announcement");
@@ -195,6 +196,47 @@ async function run() {
       const result = await postCollection.deleteOne(filter);
       res.send(result);
     });
+    //update
+    app.patch('/post/upvote/:id', async(req, res) =>{
+        const id = req.params.id
+        const filter = {_id: new ObjectId(id)}
+        const currentPost = await postCollection.findOne(filter);
+        const currentUpVote = parseInt(currentPost.upVote)
+        const updatedUpVote = currentUpVote + 1;    
+        const updateDoc = {
+            $set:{
+                upVote: updatedUpVote
+            }
+        }
+        const result = await postCollection.updateOne(filter, updateDoc)
+        res.send(result)
+    })
+    app.patch('/post/downvote/:id', async(req, res) =>{
+        const id = req.params.id
+        const filter = {_id: new ObjectId(id)}
+        const currentPost = await postCollection.findOne(filter);
+        const currentDownVote = parseInt(currentPost.downVote)
+        const updatedDownVote = currentDownVote + 1;    
+        const updateDoc = {
+            $set:{
+                downVote: updatedDownVote
+            }
+        }
+        const result = await postCollection.updateOne(filter, updateDoc)
+        res.send(result)
+    })
+
+
+    //post tags
+    app.get('/tags',async (req, res) =>{
+        const result = await tagsCollection.find().toArray()
+        res.send(result)
+    })
+    app.post('/tags', async(req, res) =>{
+        const data = req.body;
+        const result = await tagsCollection.insertOne(data)
+        res.send(result)
+    })
 
 
 
