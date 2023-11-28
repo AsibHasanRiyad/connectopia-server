@@ -27,7 +27,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const userCollection = client.db("connectopia").collection("users");
     const postCollection = client.db("connectopia").collection("post");
@@ -144,6 +144,7 @@ async function run() {
         const result = await postCollection
           .find(query)
           .skip(page * size)
+          .sort({ postedTime: -1 })
           .limit(size)
           .toArray();
 
@@ -152,6 +153,7 @@ async function run() {
         const query = email ? { email: email } : {};
         const result = await postCollection
           .find(query)
+          .sort({ postedTime: -1 })
           .skip(page * size)
           .limit(size)
           .toArray();
@@ -163,6 +165,14 @@ async function run() {
     // total number of post
     app.get("/postCount", async (req, res) => {
       const count = await postCollection.estimatedDocumentCount();
+      res.send({ count });
+    });
+    app.get("/commentCount", async (req, res) => {
+      const count = await commentCollection.estimatedDocumentCount();
+      res.send({ count });
+    });
+    app.get("/usersCount", async (req, res) => {
+      const count = await userCollection.estimatedDocumentCount();
       res.send({ count });
     });
 
