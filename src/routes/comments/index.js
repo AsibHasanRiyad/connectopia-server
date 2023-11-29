@@ -14,7 +14,7 @@ router.get('/comments', async(req, res) =>{
 })
 router.post('/comments', async(req, res) =>{
     const data = req.body
-    const result = await Comments.insertOne(data)
+    const result = await Comments.create(data)
     res.send(result)
 })
 

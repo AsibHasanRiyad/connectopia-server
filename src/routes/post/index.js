@@ -13,57 +13,40 @@ router.post("/post", async (req, res) => {
 //individual post routes
 router.get("/post/:id", async (req, res) => {
   const id = req.params.id;
-//   const filter = { _id: new ObjectId(id) };
+  //   const filter = { _id: new ObjectId(id) };
   const result = await Post.findById(id);
   res.send(result);
 });
 router.delete("/post/:id", async (req, res) => {
   const id = req.params.id;
-//   const filter = { _id: new ObjectId(id) };
+  //   const filter = { _id: new ObjectId(id) };
   const result = await Post.findByIdAndDelete(id);
   res.send(result);
 });
 //update
 router.patch("/post/upvote/:id", async (req, res) => {
   const id = req.params.id;
-  //   const filter = {_id: new ObjectId(id)}
-  //   const currentPost = await Post.findOne(filter);
-  //   const currentUpVote = parseInt(currentPost.upVote)
-  //   const updatedUpVote = currentUpVote + 1;
-  //   const updateDoc = {
-  //       $set:{
-  //           upVote: updatedUpVote
-  //       }
-  //   }
-  //   const result = await Post.updateOne(filter, updateDoc)
+  const post = await Post.findById(id)
+  const currentUpVote = parseInt(post.upVote, 10);
+  const updatedUpVote = currentUpVote + 1;
   const result = await Post.findByIdAndUpdate(
     id,
-    { $inc: { upVote: 1 } },
-    { new: true }
-  );
-  res.send(result);
-  res.send(result);
+    { $set: { upVote: updatedUpVote.toString() } },
+    { new: true, runValidators: true }
+  )
+  res.send(result)
 });
 router.patch("/post/downvote/:id", async (req, res) => {
   const id = req.params.id;
-  //   const filter = {_id: new ObjectId(id)}
-  //   const currentPost = await Post.findOne(filter);
-  //   const currentDownVote = parseInt(currentPost.downVote)
-  //   const updatedDownVote = currentDownVote + 1;
-  //   const updateDoc = {
-  //       $set:{
-  //           downVote: updatedDownVote
-  //       }
-  //   }
-  //   const result = await Post.updateOne(filter, updateDoc)
+  const post = await Post.findById(id)
+  const currentDownVote = parseInt(post.upVote, 10)
+  const updateDownVote = currentDownVote + 1;
+  const result = await Post.findByIdAndUpdate(id,
+    {$set: {downVote: updateDownVote.toString()}},
+    {new: true , runValidators: true}
+  )
 
-  const result = await Post.findByIdAndUpdate(
-    id,
-    { $inc: { downVote: 1 } },
-    { new: true }
-  );
-  res.send(result);
-  res.send(result);
+  res.send(result)
 });
 
 module.exports = router;
