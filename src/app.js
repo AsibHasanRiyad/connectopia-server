@@ -19,6 +19,7 @@ const postCount = require('./routes/postCount/index')
 const commentsCount = require('./routes/commentCount/index');
 const usersCount = require('./routes/UsersCount/index')
 const paymentCollection = require('./routes/payments/index')
+const myPostCount = require('./routes/myPostCount/index')
 
 
 applyMiddleware(app)
@@ -34,6 +35,7 @@ app.use(postCount)
 app.use(commentsCount)
 app.use(usersCount)
 app.use(paymentCollection)
+app.use(myPostCount)
 
 
 
@@ -62,11 +64,13 @@ app.get("/health", (req, res) => {
     })
   })
   
- const main = async () =>{
-  await connectDB()
-  app.listen(port, () => {
-    console.log(`Connectopia server is running on port:${port}`);
-  });
- }
+//  const main = async () =>{
+//   await connectDB()
+//   app.listen(port, () => {
+//     console.log(`Connectopia server is running on port:${port}`);
+//   });
+//  }
 
- main()
+//  main()
+
+module.exports = app

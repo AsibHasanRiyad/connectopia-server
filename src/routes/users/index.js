@@ -2,13 +2,16 @@ var express = require("express");
 const Users = require("../../model/users");
 // const { createToken } = require("../../api/authentication/controllers");
 const verifyToken = require("../../middleware/verifyToken");
+const verifyAdmin = require("../../middleware/verifyAdmin");
 var router = express.Router();
 
 //TODO: Verify TOken
 router.get("/users", verifyToken, async (req, res) => {
     const email = req.query.email;
+    const page = parseInt(req.query.page);
+    const size = parseInt(req.query.size);
     const query = email ? { email: email } : {};
-    const result = await Users.find(query)
+    const result = await Users.find(query).skip(page*size).limit(size)
     res.send(result);
   });
   router.get("/users/:email", async (req, res) => {
@@ -32,7 +35,7 @@ router.get("/users", verifyToken, async (req, res) => {
   });
 
   //todo: verify token add..without verify token decoded won't work
-  router.get("/users/admin/:email",verifyToken, async (req, res) => {
+  router.get("/users/admin/:email",verifyToken,verifyAdmin, async (req, res) => {
     const email = req.params.email;
     if (email !== req.decoded.email) {
       return res.status(403).send({ message: "forbidden access" });
@@ -49,13 +52,12 @@ router.get("/users", verifyToken, async (req, res) => {
   //make a user admin
   router.patch("/users/:id", async (req, res) => {
     const id = req.params.id;
-    const filter = { _id: new ObjectId(id) };
     const updateDoc = {
       $set: {
         role: "admin",
       },
     };
-    const result = await Users.findByIdAndUpdate(filter, updateDoc);
+    const result = await Users.findByIdAndUpdate(id, updateDoc);
     res.send(result);
   });
 

@@ -5,6 +5,7 @@ const getAllPost = async (req, res) => {
     const email = req.query.email;
     const page = parseInt(req.query.page);
     const size = parseInt(req.query.size);
+    console.log('hello',page, size, email);
   
     if (tag) {
       const query = { tags: tag };
@@ -13,7 +14,6 @@ const getAllPost = async (req, res) => {
         .skip(page * size)
         .sort({ postedTime: -1 })
         .limit(size)
-      //   .toArray();
   
       res.send(result);
     } else {
@@ -23,7 +23,6 @@ const getAllPost = async (req, res) => {
         .sort({ postedTime: -1 })
         .skip(page * size)
         .limit(size)
-      //   .toArray();
   
       res.send(result);
     }
